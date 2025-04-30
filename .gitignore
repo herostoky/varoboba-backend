@@ -59,4 +59,8 @@ nunit-*.xml
 # Visual studio
 .vs/
 
+# Logs
+src/VarobobaBackend.Web/log*.txt
 
+# Temp DB
+src/VarobobaBackend.Web/database.sqlite*
