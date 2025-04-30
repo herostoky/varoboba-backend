@@ -1,13 +1,9 @@
 namespace VarobobaBackend.Core.VendorAggregate;
 
-using System;
-using System.Collections.Generic;
-using Ardalis.GuardClauses;
-
 public class Vendor : EntityBase, IAggregateRoot
 {
-    private List<VendorPaymentMethod> _paymentMethods = new();
-    private List<VendorDeliveryOption> _deliveryOptions = new();
+    private readonly List<VendorPaymentMethod> _paymentMethods = [];
+    private readonly List<VendorDeliveryOption> _deliveryOptions = [];
 
 
     public Vendor(VendorId id,
@@ -16,11 +12,11 @@ public class Vendor : EntityBase, IAggregateRoot
                   Slug slug,
                   VendorDescription description)
     {
-        Id = Guard.Against.Null(id, nameof(id));
-        OwnerId = Guard.Against.Null(ownerId, nameof(ownerId));
-        Name = Guard.Against.Null(name, nameof(name));
-        Slug = Guard.Against.Null(slug, nameof(slug));
-        Description = Guard.Against.Null(description, nameof(description));
+        Id = Guard.Against.Null(id);
+        OwnerId = Guard.Against.Null(ownerId);
+        Name = Guard.Against.Null(name);
+        Slug = Guard.Against.Null(slug);
+        Description = Guard.Against.Null(description);
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
     }
@@ -44,34 +40,34 @@ public class Vendor : EntityBase, IAggregateRoot
 
     public void Update(VendorName name, VendorDescription description, Slug slug)
     {
-        Name = Guard.Against.Null(name, nameof(name));
-        Description = Guard.Against.Null(description, nameof(description));
-        Slug = Guard.Against.Null(slug, nameof(slug));
+        Name = Guard.Against.Null(name);
+        Description = Guard.Against.Null(description);
+        Slug = Guard.Against.Null(slug);
         UpdatedAt = DateTime.UtcNow;
     }
 
     public void SetCategory(CategoryId categoryId, CategoryId? subCategoryId = null)
     {
-        CategoryId = Guard.Against.Null(categoryId, nameof(categoryId));
+        CategoryId = Guard.Against.Null(categoryId);
         SubCategoryId = subCategoryId;
         UpdatedAt = DateTime.UtcNow;
     }
 
     public void UpdateContactInfo(VendorContactInfo contactInfo)
     {
-        ContactInfo = Guard.Against.Null(contactInfo, nameof(contactInfo));
+        ContactInfo = Guard.Against.Null(contactInfo);
         UpdatedAt = DateTime.UtcNow;
     }
 
     public void UpdateLocation(VendorLocation location)
     {
-        Location = Guard.Against.Null(location, nameof(location));
+        Location = Guard.Against.Null(location);
         UpdatedAt = DateTime.UtcNow;
     }
 
     public void UpdateVisualIdentity(VendorVisualIdentity visualIdentity)
     {
-        VisualIdentity = Guard.Against.Null(visualIdentity, nameof(visualIdentity));
+        VisualIdentity = Guard.Against.Null(visualIdentity);
         UpdatedAt = DateTime.UtcNow;
     }
 
@@ -125,9 +121,9 @@ public class VendorPaymentMethod
     public VendorPaymentMethod(Guid id, VendorId vendorId, PaymentProvider type, string identifier, string label)
     {
         Id = id;
-        VendorId = Guard.Against.Null(vendorId, nameof(vendorId));
+        VendorId = Guard.Against.Null(vendorId);
         Type = type;
-        Identifier = Guard.Against.NullOrWhiteSpace(identifier, nameof(identifier));
+        Identifier = Guard.Against.NullOrWhiteSpace(identifier);
         Label = label;
         CreatedAt = DateTime.UtcNow;
     }
@@ -145,9 +141,9 @@ public class VendorDeliveryOption
     public VendorDeliveryOption(Guid id, VendorId vendorId, string deliveryHours, Money price, string estimatedTime, string coverageArea)
     {
         Id = id;
-        VendorId = Guard.Against.Null(vendorId, nameof(vendorId));
+        VendorId = Guard.Against.Null(vendorId);
         DeliveryHours = deliveryHours;
-        Price = Guard.Against.Null(price, nameof(price));
+        Price = Guard.Against.Null(price);
         EstimatedTime = estimatedTime;
         CoverageArea = coverageArea;
         CreatedAt = DateTime.UtcNow;
@@ -187,9 +183,11 @@ public record VendorName
 
     public VendorName(string value)
     {
-        Value = Guard.Against.NullOrWhiteSpace(value, nameof(value));
+        Value = Guard.Against.NullOrWhiteSpace(value);
         if (value.Length < 3 || value.Length > 100)
-            throw new ArgumentException("Vendor name must be between 3 and 100 characters", nameof(value));
+        {
+            throw new ArgumentException("Vendor name must be between 3 and 100 characters");
+        }
     }
 
     public static implicit operator string(VendorName name) => name.Value;
@@ -201,15 +199,14 @@ public record Slug
 
     public Slug(string value)
     {
-        Value = Guard.Against.NullOrWhiteSpace(value, nameof(value));
+        Value = Guard.Against.NullOrWhiteSpace(value);
         if (!IsValidSlug(value))
-            throw new ArgumentException("Invalid slug format. Use lowercase letters, numbers, and hyphens only.", nameof(value));
+        {
+            throw new ArgumentException("Invalid slug format. Use lowercase letters, numbers, and hyphens only.");
+        }
     }
 
-    private bool IsValidSlug(string value)
-    {
-        return System.Text.RegularExpressions.Regex.IsMatch(value, "^[a-z0-9]+(?:-[a-z0-9]+)*$");
-    }
+    private static bool IsValidSlug(string value) => System.Text.RegularExpressions.Regex.IsMatch(value, "^[a-z0-9]+(?:-[a-z0-9]+)*$");
 
     public static implicit operator string(Slug slug) => slug.Value;
 }
@@ -222,7 +219,9 @@ public record VendorDescription
     {
         Value = value ?? string.Empty;
         if (value?.Length > 500)
-            throw new ArgumentException("Description cannot exceed 500 characters", nameof(value));
+        {
+            throw new ArgumentException("Description cannot exceed 500 characters");
+        }
     }
 
     public static implicit operator string(VendorDescription description) => description.Value;
@@ -234,12 +233,14 @@ public record Email
 
     public Email(string value)
     {
-        Value = Guard.Against.NullOrWhiteSpace(value, nameof(value));
+        Value = Guard.Against.NullOrWhiteSpace(value);
         if (!IsValidEmail(value))
-            throw new ArgumentException("Invalid email format", nameof(value));
+        {
+            throw new ArgumentException("Invalid email format");
+        }
     }
 
-    private bool IsValidEmail(string value)
+    private static bool IsValidEmail(string value)
     {
         try
         {
@@ -261,15 +262,15 @@ public record PhoneNumber
 
     public PhoneNumber(string value)
     {
-        Value = Guard.Against.NullOrWhiteSpace(value, nameof(value));
+        Value = Guard.Against.NullOrWhiteSpace(value);
         if (!IsValidPhoneNumber(value))
-            throw new ArgumentException("Phone number should be in E.164 format", nameof(value));
+        {
+            throw new ArgumentException("Phone number should be in E.164 format");
+        }
     }
 
-    private bool IsValidPhoneNumber(string value)
-    {
-        return System.Text.RegularExpressions.Regex.IsMatch(value, @"^\+[1-9]\d{1,14}$");
-    }
+    private static bool IsValidPhoneNumber(string value)
+    => System.Text.RegularExpressions.Regex.IsMatch(value, @"^\+[1-9]\d{1,14}$");
 
     public static implicit operator string(PhoneNumber phone) => phone.Value;
 }
@@ -284,7 +285,9 @@ public record HexColor
             value = "#000000";
 
         if (!System.Text.RegularExpressions.Regex.IsMatch(value, "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"))
-            throw new ArgumentException("Invalid hex color format. Use #RGB or #RRGGBB format.", nameof(value));
+        {
+            throw new ArgumentException("Invalid hex color format. Use #RGB or #RRGGBB format.");
+        }
 
         Value = value;
     }
@@ -312,7 +315,9 @@ public record Money
     public Money(decimal amount, string currency = "MGA")
     {
         if (amount < 0)
-            throw new ArgumentException("Amount cannot be negative", nameof(amount));
+        {
+            throw new ArgumentException("Amount cannot be negative");
+        }
 
         Amount = amount;
         Currency = currency;
@@ -327,8 +332,8 @@ public record VendorContactInfo
 
     public VendorContactInfo(Email email, PhoneNumber phoneNumber, string openingHours)
     {
-        Email = Guard.Against.Null(email, nameof(email));
-        PhoneNumber = Guard.Against.Null(phoneNumber, nameof(phoneNumber));
+        Email = Guard.Against.Null(email);
+        PhoneNumber = Guard.Against.Null(phoneNumber);
         OpeningHours = openingHours ?? string.Empty;
     }
 }
@@ -342,8 +347,8 @@ public record VendorLocation
     public VendorLocation(string address, string city, string region)
     {
         Address = address ?? string.Empty;
-        City = Guard.Against.NullOrWhiteSpace(city, nameof(city));
-        Region = Guard.Against.NullOrWhiteSpace(region, nameof(region));
+        City = Guard.Against.NullOrWhiteSpace(city);
+        Region = Guard.Against.NullOrWhiteSpace(region);
     }
 }
 
