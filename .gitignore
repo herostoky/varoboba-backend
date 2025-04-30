@@ -52,3 +52,11 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Copilot
+.github/copilot-instructions.md
+
+# Visual studio
+.vs/
+
+
